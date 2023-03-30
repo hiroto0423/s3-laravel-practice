@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,11 +16,19 @@ use App\Http\Controllers\PostsController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+
+
+Route::get('/posts/add', [PostsController::class, 'add']);
+Route::post('/posts/create', [PostsController::class, 'create']);
+Route::get('posts/index', [PostsController::class,'index']);
+
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/', [AuthController::class, 'index']);
 });
 
-Route::get('/posts/add',[PostsController::class, 'add']);
-Route::post('/posts/create',[PostsController::class, 'create']);
-Route::get('posts/index',[PostsController::class,'index']);
-
+// 管理者のみアクセス可能
+Route::group(['middleware' => ['auth', 'can:admin']], function () {
+    Route::get('admin', [UserController::class,'admin']);
+});
